@@ -1,0 +1,63 @@
+﻿@model ArmyTechTask.ViewModels.Student.StudentViewModel
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div>
+    <h4>Student</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.Name):
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Name)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.BirthDate):
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.BirthDate)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Neighborhood):
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Neighborhood)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Field):
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Field)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Governorate):
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Governorate)
+        </dd>
+        <dt></dt>
+        <dd>
+            @using (Html.BeginForm("Save", "Student", FormMethod.Post))
+            {
+                @Html.AntiForgeryToken()
+                @Html.HiddenFor(l => l.Name)
+                @Html.HiddenFor(l => l.BirthDate)
+                @Html.HiddenFor(l => l.FieldId)
+                @Html.HiddenFor(l => l.GovernorateId)
+                @Html.HiddenFor(l => l.NeighborhoodId)
+                <br/>
+                <input type="submit" value="Save" class="btn btn-default"/>
+            }
+        </dd>
+    </dl>
+</div>

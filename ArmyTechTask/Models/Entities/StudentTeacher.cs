@@ -1,6 +1,6 @@
-    using System.ComponentModel.DataAnnotations.Schema;
+using System.ComponentModel.DataAnnotations.Schema;
 
-    namespace ArmyTechTask.Models
+namespace ArmyTechTask.Models.Entities
     {
 
         [Table("StudentTeacher")]

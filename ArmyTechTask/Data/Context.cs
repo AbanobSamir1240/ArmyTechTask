@@ -1,5 +1,6 @@
 using System.Data.Entity;
 using ArmyTechTask.Models;
+using ArmyTechTask.Models.Entities;
 
 namespace ArmyTechTask.Data
 {

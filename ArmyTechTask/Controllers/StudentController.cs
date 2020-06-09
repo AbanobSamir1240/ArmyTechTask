@@ -1,141 +1,112 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Data;
 using System.Data.Entity;
-using System.Linq;
 using System.Threading.Tasks;
 using System.Net;
-using System.Web;
 using System.Web.Mvc;
-using ArmyTechTask.Models;
+using ArmyTechTask.Models.Entities;
+using ArmyTechTask.Services.Student;
+using ArmyTechTask.ViewModels.Student;
 
 namespace ArmyTechTask.Controllers
 {
     public class StudentController : Controller
     {
-        private Context db = new Context();
+        private readonly IStudentManagerService _studentManagerService;
 
-        // GET: Student
+        public StudentController()
+        {
+            _studentManagerService = new StudentManagerService();
+        }
+
         public async Task<ActionResult> Index()
         {
-            var students = db.Students.Include(s => s.Field).Include(s => s.Governorate).Include(s => s.Neighborhood);
-            return View(await students.ToListAsync());
+            return View(await _studentManagerService.GetAllStudent());
         }
 
-        // GET: Student/Details/5
-        public async Task<ActionResult> Details(int? id)
+        public async Task<ActionResult> Create()
         {
-            if (id == null)
-            {
-                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
-            }
-            Student student = await db.Students.FindAsync(id);
-            if (student == null)
-            {
-                return HttpNotFound();
-            }
-            return View(student);
-        }
-
-        // GET: Student/Create
-        public ActionResult Create()
-        {
-            ViewBag.FieldId = new SelectList(db.Fields, "ID", "Name");
-            ViewBag.GovernorateId = new SelectList(db.Governorates, "ID", "Name");
-            ViewBag.NeighborhoodId = new SelectList(db.Neighborhoods, "ID", "Name");
+            ViewBag.fields = new SelectList(await _studentManagerService.GetAllField(), "Id", "Name");
+            ViewBag.governorates = new SelectList(await _studentManagerService.GetAllGovernorate(), "Id", "Name");
+            ViewBag.neighborhoods = new SelectList(await _studentManagerService.GetAllNeighborhood(), "Id", "Name");
             return View();
         }
 
-        // POST: Student/Create
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
-        // more details see https://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> Create([Bind(Include = "ID,Name,BirthDate,GovernorateId,NeighborhoodId,FieldId")] Student student)
+        public async Task<ActionResult> Create(StudentViewModel student)
         {
             if (ModelState.IsValid)
             {
-                db.Students.Add(student);
-                await db.SaveChangesAsync();
-                return RedirectToAction("Index");
+                student.Governorate = await _studentManagerService.GetGovernorate(student.GovernorateId);
+                student.Field = await _studentManagerService.GetField(student.FieldId);
+                student.Neighborhood = await _studentManagerService.GetNeighborhood(student.NeighborhoodId);
+                return View("SaveStudent", student);
             }
 
-            ViewBag.FieldId = new SelectList(db.Fields, "ID", "Name", student.FieldId);
-            ViewBag.GovernorateId = new SelectList(db.Governorates, "ID", "Name", student.GovernorateId);
-            ViewBag.NeighborhoodId = new SelectList(db.Neighborhoods, "ID", "Name", student.NeighborhoodId);
+            ViewBag.fields = new SelectList(await _studentManagerService.GetAllField(), "Id", "Name");
+            ViewBag.governorates = new SelectList(await _studentManagerService.GetAllGovernorate(), "Id", "Name");
+            ViewBag.neighborhoods = new SelectList(await _studentManagerService.GetAllNeighborhood(), "Id", "Name");
             return View(student);
         }
 
-        // GET: Student/Edit/5
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<ActionResult> Save(StudentViewModel student)
+        {
+            if (ModelState.IsValid)
+            {
+                await _studentManagerService.Insert(student);
+                return RedirectToAction("Index");
+            }
+
+            return View("Create", student);
+        }
+
         public async Task<ActionResult> Edit(int? id)
         {
             if (id == null)
             {
-                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+                return RedirectToAction("Index");
             }
-            Student student = await db.Students.FindAsync(id);
+
+            var student = await _studentManagerService.GetStudent((int) id);
             if (student == null)
             {
-                return HttpNotFound();
+                return RedirectToAction("Create");
             }
-            ViewBag.FieldId = new SelectList(db.Fields, "ID", "Name", student.FieldId);
-            ViewBag.GovernorateId = new SelectList(db.Governorates, "ID", "Name", student.GovernorateId);
-            ViewBag.NeighborhoodId = new SelectList(db.Neighborhoods, "ID", "Name", student.NeighborhoodId);
+
+            ViewBag.fields = new SelectList(await _studentManagerService.GetAllField(), "Id", "Name");
+            ViewBag.governorates = new SelectList(await _studentManagerService.GetAllGovernorate(), "Id", "Name");
+            ViewBag.neighborhoods = new SelectList(await _studentManagerService.GetAllNeighborhood(), "Id", "Name");
             return View(student);
         }
 
-        // POST: Student/Edit/5
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
-        // more details see https://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> Edit([Bind(Include = "ID,Name,BirthDate,GovernorateId,NeighborhoodId,FieldId")] Student student)
+        public async Task<ActionResult> Edit(StudentViewModel student)
         {
             if (ModelState.IsValid)
             {
-                db.Entry(student).State = EntityState.Modified;
-                await db.SaveChangesAsync();
+                await _studentManagerService.Edit(student);
                 return RedirectToAction("Index");
             }
-            ViewBag.FieldId = new SelectList(db.Fields, "ID", "Name", student.FieldId);
-            ViewBag.GovernorateId = new SelectList(db.Governorates, "ID", "Name", student.GovernorateId);
-            ViewBag.NeighborhoodId = new SelectList(db.Neighborhoods, "ID", "Name", student.NeighborhoodId);
+
+            ViewBag.fields = new SelectList(await _studentManagerService.GetAllField(), "Id", "Name");
+            ViewBag.governorates = new SelectList(await _studentManagerService.GetAllGovernorate(), "Id", "Name");
+            ViewBag.neighborhoods = new SelectList(await _studentManagerService.GetAllNeighborhood(), "Id", "Name");
             return View(student);
         }
 
-        // GET: Student/Delete/5
         public async Task<ActionResult> Delete(int? id)
         {
-            if (id == null)
+            if (id == null || id == 0)
             {
-                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+                return RedirectToAction("Index");
             }
-            Student student = await db.Students.FindAsync(id);
-            if (student == null)
-            {
-                return HttpNotFound();
-            }
-            return View(student);
-        }
 
-        // POST: Student/Delete/5
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<ActionResult> DeleteConfirmed(int id)
-        {
-            Student student = await db.Students.FindAsync(id);
-            db.Students.Remove(student);
-            await db.SaveChangesAsync();
+            await _studentManagerService.Delete((int) id);
             return RedirectToAction("Index");
         }
 
-        protected override void Dispose(bool disposing)
-        {
-            if (disposing)
-            {
-                db.Dispose();
-            }
-            base.Dispose(disposing);
-        }
     }
 }

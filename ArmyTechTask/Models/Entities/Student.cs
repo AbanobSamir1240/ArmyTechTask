@@ -1,9 +1,9 @@
-    using System;
-    using System.Collections.Generic;
-    using System.ComponentModel.DataAnnotations;
-    using System.ComponentModel.DataAnnotations.Schema;
+using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
-    namespace ArmyTechTask.Models
+namespace ArmyTechTask.Models.Entities
     {
         [Table("Student")]
         public partial class Student
@@ -23,7 +23,7 @@
 
             public int GovernorateId { get; set; }
 
-            public int? NeighborhoodId { get; set; }
+            public int NeighborhoodId { get; set; }
 
             public int FieldId { get; set; }
 

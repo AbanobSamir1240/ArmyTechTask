@@ -1,8 +1,8 @@
 using System.Collections.Generic;
-    using System.ComponentModel.DataAnnotations;
-    using System.ComponentModel.DataAnnotations.Schema;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
-namespace ArmyTechTask.Models
+namespace ArmyTechTask.Models.Entities
 {
     [Table("Neighborhood")]
     public partial class Neighborhood
